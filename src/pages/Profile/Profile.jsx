@@ -6,6 +6,7 @@ export const Profile = () => {
   const [data, setData] = useState([])
   const [load, setLoading] = useState(false)
   const [selectedUser, setSelectedUser] = useState(null)
+  const [deletedUser, setDeletedUser] = useState(null)
   
   const fecthData = async () => {
     setLoading(true)
@@ -52,6 +53,18 @@ export const Profile = () => {
     
   }
 
+  const deleteUser = async (userToDelete) =>{
+    setLoading(true)
+    try {
+      await fetch(`http://localhost:3002/users/${userToDelete.id}`, {method: 'DELETE'})
+    } catch (error) {
+      console.log("it seems like you are not be able to eliminate this user..", error)
+    } finally{
+      setLoading(false)
+    }
+
+  }
+
   //useEffect(() => {
   //  fecthData()
   //}, [])
@@ -75,6 +88,7 @@ export const Profile = () => {
        <p>Email: {value.email}</p>
        <button onClick={() => setSelectedUser(value)}>Edit me!</button>
        {selectedUser && <Edit user={selectedUser} patchData={patchData} load={load}/>}
+       <button onClick={() => deleteUser(value)}>Delete me! D:</button>
        </div>
      )}    
     </div>
