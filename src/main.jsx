@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom/client'
 import './index.css'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { Layout } from './components/Layout/Layout'
-import { Login } from './pages/Login/Login'
 import { Register } from './pages/Register/Register'
 import App from './App'
 import { PageNotFound } from './pages/PageNotFound/PageNotFound'
-import { AuthProvider } from 'contexs/AuthContext'
+import { Users } from './pages/Users/Users'
+import { Profile } from './pages/Profile/Profile'
+//import { AuthProvider } from 'contexs/AuthContext'
 
-const rooter = createBrowserRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <Layout />,
@@ -19,8 +20,12 @@ const rooter = createBrowserRouter([
         element: <App />,
       },
       {
-        path: "login",
-        element: <Login />,
+        path: "users",
+        element: <Users />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
       },
       {
         path: "register",
@@ -36,8 +41,6 @@ const rooter = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <AuthProvider>
-    <RouterProvider rooter={rooter} />
-    </AuthProvider>
+    <RouterProvider router={router} />
   </React.StrictMode>,
 )

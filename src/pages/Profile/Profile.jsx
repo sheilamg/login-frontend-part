@@ -1,36 +1,83 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { NavLink } from 'react-router-dom'
+import { Edit } from '../Edit/Edit'
 
 export const Profile = () => {
-  const [userData, setUserData] = useState(null)
-  const { user } = useContext(AuthContext)
+  const [data, setData] = useState([])
+  const [load, setLoading] = useState(false)
+  const [selectedUser, setSelectedUser] = useState(null)
   
-  useEffect( () => {
-    const fetchUserData = async () => {
-        try {
-            const response = await fetch('/api/user',{
-                headers: {
-                    'Authorization': `Bearer ${getToken()}`,
-                },
-            })
-            const data = await response.json()
-            setUserData(data)
-        } catch (error) {
-            console.error('Failed to fetch the user data', error)
-        }
-    }
+  const fecthData = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('http://localhost:3002/users/')
+      const data = await res.json()
 
-    if(user){
-        fetchUserData()
+      setData(data)
+      
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setLoading(false)
     }
-  }, [user])
+    
+  }
 
-  if(!userData) return <div>Loading..</div>
+  //patch
+  const patchData = async (updateData) => {
+    if(!selectedUser) return;
+    setLoading(true)
+    try {
+      const res = await fetch(`http://localhost:3002/users/${selectedUser.id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      })
+
+      if(response.ok){
+        const updateUser = await res.json()
+        setData(prevData => prevData.map(item => item.id === updateUser.id ? updateUser : item))
+        setSelectedUser(updateUser)
+      }else{
+        console.log('Error patching data', res.statusText)
+      }
+      
+    } catch (error) {
+        console.log('Error patching data from error',error)
+    } finally {
+        setLoading(false)
+    }
+    
+  }
+
+  //useEffect(() => {
+  //  fecthData()
+  //}, [])
 
   return (
-    <>
+    <div>
+        <NavLink to="/">
+        <button className='home-button'>Go to Home</button>
+        </NavLink>
+       
+    
      <div>Profile</div>
-     <p>Email: {userData.email}</p>   
-    </>
+
+     
+     
+     <button onClick={fecthData}>Click me to get the data</button>
+     {load && <p>Loading...</p> }
+     {data.length > 0 && data.map((value, index) =>
+       <div key={index}> 
+       <p>Name: {value.name}</p>
+       <p>Email: {value.email}</p>
+       <button onClick={() => setSelectedUser(value)}>Edit me!</button>
+       {selectedUser && <Edit user={selectedUser} patchData={patchData} load={load}/>}
+       </div>
+     )}    
+    </div>
     
   )
 }
